@@ -9,13 +9,11 @@
     }
   ],
   "compilerOptions": {
-    // ...
+    "jsx": "react",
+    "lib": ["dom", "DOM.Iterable", "ESNext"],
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
-    // ...
   }
 }
