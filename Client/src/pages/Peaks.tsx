@@ -8,7 +8,7 @@ function Peaks() {
   const eqNode = useRef(null);
   const gainNode = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isEQEnabled, setIsEQEnabled] = useState(true);
+  const [isEQEnabled, setIsEQEnabled] = useState(false);
 
   useEffect(() => {
     audioContext.current = new (window.AudioContext ||
@@ -65,9 +65,9 @@ function Peaks() {
     setIsPlaying(false);
   };
 
-  const playAudio = async (useEQ) => {
+  const playAudio = async () => {
     if (isPlaying) {
-      stopAudio();
+      return; // If already playing, do nothing
     }
 
     if (!audioContext.current) return;
@@ -80,9 +80,9 @@ function Peaks() {
 
       sourceNode.current = audioContext.current.createBufferSource();
       sourceNode.current.buffer = audioBuffer;
+      sourceNode.current.loop = true; // Enable looping
 
-      setIsEQEnabled(useEQ);
-      if (useEQ) {
+      if (isEQEnabled) {
         sourceNode.current.connect(eqNode.current.input);
         eqNode.current.output.connect(gainNode.current);
       } else {
@@ -93,9 +93,7 @@ function Peaks() {
       sourceNode.current.start(0);
       setIsPlaying(true);
 
-      sourceNode.current.onended = () => {
-        setIsPlaying(false);
-      };
+      // Remove the onended event as it won't be needed for looping audio
     } catch (error) {
       console.error("Error playing audio:", error);
     }
@@ -109,33 +107,25 @@ function Peaks() {
     <div>
       <h1>Welcome to the Home Page</h1>
       <button
-        onClick={() => playAudio(false)}
+        onClick={playAudio}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+        disabled={isPlaying}
       >
-        Play Original
+        Play
       </button>
       <button
-        onClick={() => playAudio(true)}
-        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+        onClick={stopAudio}
+        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
+        disabled={!isPlaying}
       >
-        Play with EQ
+        Stop
       </button>
-      {isPlaying && (
-        <>
-          <button
-            onClick={stopAudio}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 mr-2"
-          >
-            Stop
-          </button>
-          <button
-            onClick={toggleEQ}
-            className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500 hover:bg-gray-600"} text-white rounded`}
-          >
-            {isEQEnabled ? "Disable EQ" : "Enable EQ"}
-          </button>
-        </>
-      )}
+      <button
+        onClick={toggleEQ}
+        className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500 hover:bg-gray-600"} text-white rounded`}
+      >
+        {isEQEnabled ? "Disable EQ" : "Enable EQ"}
+      </button>
     </div>
   );
 }
