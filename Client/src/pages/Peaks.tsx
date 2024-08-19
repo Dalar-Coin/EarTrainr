@@ -2,75 +2,90 @@ import React, { useEffect, useRef, useState } from "react";
 
 import trapBeat from "/songs/First Trap Beat.wav";
 
+type FrequencyBand = "low" | "mid" | "high";
+
 function Peaks() {
-  const audioContext = useRef(null);
-  const sourceNode = useRef(null);
-  const eqNode = useRef(null);
-  const gainNode = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEQEnabled, setIsEQEnabled] = useState(false);
+  const [boostedBand, setBoostedBand] = useState<FrequencyBand | null>(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const audioContext = useRef<AudioContext | null>(null);
+  const sourceNode = useRef<AudioBufferSourceNode | null>(null);
+  const gainNode = useRef<GainNode | null>(null);
+  const eqNodes = useRef<{ [key in FrequencyBand]: BiquadFilterNode } | null>(
+    null
+  );
 
   useEffect(() => {
     audioContext.current = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    eqNode.current = createEQ(audioContext.current);
+      (window as any).webkitAudioContext)();
     gainNode.current = audioContext.current.createGain();
-    gainNode.current.gain.value = 0.3;
-
-    return () => {
-      if (audioContext.current) {
-        audioContext.current.close();
-      }
-    };
+    gainNode.current.gain.value = 0.5; // Set volume to 50%
+    eqNodes.current = createEQ(audioContext.current);
+    return () => audioContext.current?.close();
   }, []);
 
   useEffect(() => {
-    if (sourceNode.current && eqNode.current && gainNode.current) {
+    if (
+      isPlaying &&
+      sourceNode.current &&
+      gainNode.current &&
+      eqNodes.current
+    ) {
       sourceNode.current.disconnect();
+      gainNode.current.disconnect();
+
+      sourceNode.current.connect(gainNode.current);
+
       if (isEQEnabled) {
-        sourceNode.current.connect(eqNode.current.input);
-        eqNode.current.output.connect(gainNode.current);
+        gainNode.current
+          .connect(eqNodes.current.low)
+          .connect(eqNodes.current.mid)
+          .connect(eqNodes.current.high)
+          .connect(audioContext.current!.destination);
       } else {
-        sourceNode.current.connect(gainNode.current);
+        gainNode.current.connect(audioContext.current!.destination);
       }
     }
-  }, [isEQEnabled]);
+  }, [isEQEnabled, isPlaying]);
 
-  const createEQ = (context) => {
-    const low = context.createBiquadFilter();
-    low.type = "lowshelf";
-    low.frequency.value = 320;
-    low.gain.value = 6;
+  const createEQ = (context: AudioContext) => {
+    const createFilter = (
+      type: BiquadFilterType,
+      frequency: number,
+      gain = 0
+    ) => {
+      const filter = context.createBiquadFilter();
+      filter.type = type;
+      filter.frequency.value = frequency;
+      filter.gain.value = gain;
+      return filter;
+    };
 
-    const mid = context.createBiquadFilter();
-    mid.type = "peaking";
-    mid.frequency.value = 1000;
-    mid.Q.value = 1;
-    mid.gain.value = 0;
-
-    const high = context.createBiquadFilter();
-    high.type = "highshelf";
-    high.frequency.value = 3200;
-    high.gain.value = 0;
-
-    low.connect(mid).connect(high);
-    return { input: low, output: high };
+    return {
+      low: createFilter("lowshelf", 320),
+      mid: createFilter("peaking", 1000),
+      high: createFilter("highshelf", 3200),
+    };
   };
 
-  const stopAudio = () => {
-    if (sourceNode.current) {
-      sourceNode.current.stop();
-      sourceNode.current.disconnect();
+  const resetEQ = () => {
+    if (eqNodes.current) {
+      Object.values(eqNodes.current).forEach((node) => {
+        node.gain.value = 0;
+      });
     }
-    setIsPlaying(false);
   };
 
   const playAudio = async () => {
-    if (isPlaying) {
-      return; // If already playing, do nothing
-    }
-
-    if (!audioContext.current) return;
+    if (
+      isPlaying ||
+      !audioContext.current ||
+      !gainNode.current ||
+      !eqNodes.current
+    )
+      return;
 
     try {
       const response = await fetch(trapBeat);
@@ -80,38 +95,50 @@ function Peaks() {
 
       sourceNode.current = audioContext.current.createBufferSource();
       sourceNode.current.buffer = audioBuffer;
-      sourceNode.current.loop = true; // Enable looping
+      sourceNode.current.loop = true;
 
-      if (isEQEnabled) {
-        sourceNode.current.connect(eqNode.current.input);
-        eqNode.current.output.connect(gainNode.current);
-      } else {
-        sourceNode.current.connect(gainNode.current);
-      }
+      resetEQ();
+      const randomBand = ["low", "mid", "high"][
+        Math.floor(Math.random() * 3)
+      ] as FrequencyBand;
+      eqNodes.current[randomBand].gain.value = 6;
+      setBoostedBand(randomBand);
+
+      sourceNode.current.connect(gainNode.current);
       gainNode.current.connect(audioContext.current.destination);
 
       sourceNode.current.start(0);
       setIsPlaying(true);
-
-      // Remove the onended event as it won't be needed for looping audio
+      setShowResult(false);
+      setIsEQEnabled(false);
     } catch (error) {
       console.error("Error playing audio:", error);
     }
   };
 
-  const toggleEQ = () => {
-    setIsEQEnabled(!isEQEnabled);
+  const stopAudio = () => {
+    sourceNode.current?.stop();
+    setIsPlaying(false);
+    setIsEQEnabled(false);
+    setShowResult(false);
+    resetEQ();
+  };
+
+  const handleGuess = (guess: FrequencyBand) => {
+    setShowResult(true);
   };
 
   return (
     <div>
-      <h1>Welcome to the Home Page</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        Welcome to the EQ Guessing Game
+      </h1>
       <button
         onClick={playAudio}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
         disabled={isPlaying}
       >
-        Play
+        Start New Round
       </button>
       <button
         onClick={stopAudio}
@@ -120,12 +147,39 @@ function Peaks() {
       >
         Stop
       </button>
-      <button
-        onClick={toggleEQ}
-        className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500 hover:bg-gray-600"} text-white rounded`}
-      >
-        {isEQEnabled ? "Disable EQ" : "Enable EQ"}
-      </button>
+      {isPlaying && (
+        <button
+          onClick={() => setIsEQEnabled(!isEQEnabled)}
+          className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white rounded mr-2`}
+        >
+          {isEQEnabled ? "Disable EQ" : "Enable EQ"}
+        </button>
+      )}
+      {isPlaying && !showResult && (
+        <div className="mt-4">
+          <p className="mb-2">
+            Toggle EQ on and guess which frequency band is boosted:
+          </p>
+          {["low", "mid", "high"].map((band) => (
+            <button
+              key={band}
+              onClick={() => handleGuess(band as FrequencyBand)}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mr-2 mt-2"
+            >
+              {band.charAt(0).toUpperCase() + band.slice(1)}
+            </button>
+          ))}
+        </div>
+      )}
+      {showResult && (
+        <div className="mt-4">
+          <p>
+            {boostedBand === null
+              ? "Please make a guess"
+              : `The boosted band was ${boostedBand}. ${boostedBand === boostedBand ? "Correct! Well done!" : "Incorrect. Try again!"}`}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
