@@ -95,13 +95,13 @@ function Peaks() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">
         Welcome to the EQ Guessing Game
       </h1>
       <button
         onClick={playAudio}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2"
         disabled={isPlaying}
       >
         Start New Round
@@ -109,29 +109,29 @@ function Peaks() {
       {isPlaying && (
         <button
           onClick={() => setIsEQEnabled(!isEQEnabled)}
-          className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white rounded mr-2`}
+          className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white rounded mb-4`}
         >
           {isEQEnabled ? "Disable EQ" : "Enable EQ"}
         </button>
       )}
       {isPlaying && (
-        <div className="mt-4">
-          <p className="mb-2">
+        <div className="w-full max-w-md">
+          <p className="text-center mb-2">
             Toggle EQ on and guess which frequency band is boosted:
           </p>
-          <div className="flex items-center">
+          <div className="flex justify-center items-center space-x-2">
             {["low", "mid", "high"].map((band) => (
               <button
                 key={band}
                 onClick={() => handleGuess(band as FrequencyBand)}
-                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 mr-2"
+                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
               >
                 {band.charAt(0).toUpperCase() + band.slice(1)}
               </button>
             ))}
             <button
               onClick={stopAudio}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 ml-2"
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               Exit
             </button>
@@ -139,7 +139,7 @@ function Peaks() {
         </div>
       )}
       {showResult && (
-        <div className="mt-4">
+        <div className="mt-4 text-center">
           <p>
             {boostedBand === null
               ? "Please make a guess"
