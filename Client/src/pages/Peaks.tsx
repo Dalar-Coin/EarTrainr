@@ -11,6 +11,9 @@ function Peaks() {
   const [boostedBand, setBoostedBand] = useState<FrequencyBand | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [userGuess, setUserGuess] = useState<FrequencyBand | null>(null);
+  const [roundEnded, setRoundEnded] = useState(false);
+  const [totalGuesses, setTotalGuesses] = useState(0);
+  const [correctGuesses, setCorrectGuesses] = useState(0);
   const audioContext = useRef<AudioContext | null>(null);
   const sourceNode = useRef<AudioBufferSourceNode | null>(null);
   const peaksEQ = useRef<PeaksEQ | null>(null);
@@ -69,6 +72,7 @@ function Peaks() {
       setShowResult(false);
       setIsEQEnabled(false);
       setUserGuess(null);
+      setRoundEnded(false);
     } catch (error) {
       console.error("Error playing audio:", error);
     }
@@ -82,16 +86,30 @@ function Peaks() {
     setShowResult(false);
     setBoostedBand(null);
     setUserGuess(null);
+    setRoundEnded(false);
     peaksEQ.current?.resetEQ();
   };
 
   const handleGuess = (guess: FrequencyBand) => {
     setUserGuess(guess);
     setShowResult(true);
+    setRoundEnded(true);
+    sourceNode.current?.stop();
+
+    setTotalGuesses(prev => prev + 1);
     if (guess === boostedBand) {
-      // Stop the audio if the guess is correct
-      stopAudio();
+      setCorrectGuesses(prev => prev + 1);
     }
+  };
+
+  const handleNextRound = () => {
+    stopAudio();
+    playAudio();
+  };
+
+  const getScorePercentage = () => {
+    if (totalGuesses === 0) return 0;
+    return Math.round((correctGuesses / totalGuesses) * 100);
   };
 
   return (
@@ -99,44 +117,50 @@ function Peaks() {
       <h1 className="text-2xl font-bold mb-4">
         Welcome to the EQ Guessing Game
       </h1>
-      <button
-        onClick={playAudio}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2"
-        disabled={isPlaying}
-      >
-        Start New Round
-      </button>
-      {isPlaying && (
+      <div className="mb-4">
+        <p>Your Score: {getScorePercentage()}% correct</p>
+      </div>
+      {!isPlaying && (
         <button
-          onClick={() => setIsEQEnabled(!isEQEnabled)}
-          className={`px-4 py-2 ${isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"} text-white rounded mb-4`}
+          onClick={playAudio}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mb-2"
         >
-          {isEQEnabled ? "Disable EQ" : "Enable EQ"}
+          Start New Round
         </button>
       )}
-      {isPlaying && (
-        <div className="w-full max-w-md">
-          <p className="text-center mb-2">
-            Toggle EQ on and guess which frequency band is boosted:
-          </p>
-          <div className="flex justify-center items-center space-x-2">
-            {["low", "mid", "high"].map((band) => (
+      {isPlaying && !roundEnded && (
+        <>
+          <button
+            onClick={() => setIsEQEnabled(!isEQEnabled)}
+            className={`px-4 py-2 ${
+              isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"
+            } text-white rounded mb-4`}
+          >
+            {isEQEnabled ? "Disable EQ" : "Enable EQ"}
+          </button>
+          <div className="w-full max-w-md">
+            <p className="text-center mb-2">
+              Toggle EQ on and guess which frequency band is boosted:
+            </p>
+            <div className="flex justify-center items-center space-x-2">
+              {["low", "mid", "high"].map((band) => (
+                <button
+                  key={band}
+                  onClick={() => handleGuess(band as FrequencyBand)}
+                  className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+                >
+                  {band.charAt(0).toUpperCase() + band.slice(1)}
+                </button>
+              ))}
               <button
-                key={band}
-                onClick={() => handleGuess(band as FrequencyBand)}
-                className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+                onClick={stopAudio}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                {band.charAt(0).toUpperCase() + band.slice(1)}
+                Exit
               </button>
-            ))}
-            <button
-              onClick={stopAudio}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Exit
-            </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
       {showResult && (
         <div className="mt-4 text-center">
@@ -144,9 +168,17 @@ function Peaks() {
             {boostedBand === null
               ? "Please make a guess"
               : userGuess === boostedBand
-                ? "Correct! Well done!"
-                : `Incorrect. The correct answer was ${boostedBand}.`}
+              ? "Correct! Well done!"
+              : `Incorrect. The correct answer was ${boostedBand}.`}
           </p>
+          {roundEnded && (
+            <button
+              onClick={handleNextRound}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Next Round
+            </button>
+          )}
         </div>
       )}
     </div>
