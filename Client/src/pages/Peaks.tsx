@@ -1,9 +1,13 @@
 import { FrequencyBand, PeaksEQ } from "../components/PeaksEQ";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import dubstep from "/songs/Free Time Finally.wav";
 import progHouse from "/songs/Prog House.wav";
 import trapBeat from "/songs/First Trap Beat.wav";
+
+function isWindowWithWebkitAudioContext(window: Window): window is Window & { webkitAudioContext: typeof AudioContext } {
+  return 'webkitAudioContext' in window;
+}
 
 function Peaks() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -20,10 +24,32 @@ function Peaks() {
   const songs = [dubstep, progHouse, trapBeat];
 
   useEffect(() => {
-    audioContext.current = new (window.AudioContext ||
-      (window as any).webkitAudioContext)();
+    let AudioContextConstructor: typeof AudioContext;
+
+    if (window.AudioContext) {
+      AudioContextConstructor = window.AudioContext;
+    } else if (isWindowWithWebkitAudioContext(window)) {
+      AudioContextConstructor = window.webkitAudioContext;
+    } else {
+      throw new Error('AudioContext not supported in this browser');
+    }
+    
+    audioContext.current = new AudioContextConstructor();
     peaksEQ.current = new PeaksEQ(audioContext.current);
-    return () => audioContext.current?.close();
+    
+    return () => {
+      const closeContext = async () => {
+        if (audioContext.current) {
+          try {
+            await audioContext.current.close();
+          } catch (error) {
+            console.error("Error closing AudioContext:", error);
+          }
+        }
+      };
+      
+      closeContext();
+    };
   }, []);
 
   useEffect(() => {

@@ -1,6 +1,20 @@
+import React, { useState } from 'react';
 import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from '../context/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(email, password);
+    navigate('/'); // Redirect to home page after login
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-md p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -60,18 +74,22 @@ function Login() {
               }}
             />
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <input
                 type="email"
                 placeholder="Email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <input
                 type="password"
                 placeholder="Password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <div className="flex items-center justify-between">
                 <div>
