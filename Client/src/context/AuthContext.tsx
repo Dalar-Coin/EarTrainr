@@ -1,8 +1,9 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
+import { login as apiLogin } from '../services/api';
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -10,23 +11,28 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    const storedAuth = localStorage.getItem('isAuthenticated');
-    return storedAuth === 'true';
+    const token = localStorage.getItem('token');
+    return !!token;
   });
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', isAuthenticated.toString());
-  }, [isAuthenticated]);
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, []);
 
-  const login = (email: string, password: string) => {
-    if (email === 'test@example.com' && password === 'password') {
+  const login = async (email: string, password: string) => {
+    try {
+      const { token } = await apiLogin(email, password);
+      localStorage.setItem('token', token);
       setIsAuthenticated(true);
-    } else {
-      alert('Invalid credentials');
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
   };
 

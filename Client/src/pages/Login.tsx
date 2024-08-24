@@ -2,17 +2,37 @@ import React, { useState } from 'react';
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from '../context/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../services/api';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerUsername, setRegisterUsername] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password);
-    navigate('/'); // Redirect to home page after login
+    try {
+      await login(email, password);
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please check your credentials.');
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await register(registerUsername, registerEmail, registerPassword);
+      alert('Registration successful. Please log in.');
+    } catch (error) {
+      console.error('Registration failed:', error);
+      alert('Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -21,36 +41,30 @@ function Login() {
         {/* Registration Form (Left Side) */}
         <div>
           <h2 className="text-xl font-semibold text-center mb-6">Register</h2>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleRegister}>
             <input
               type="text"
               placeholder="Username"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
               required
+              value={registerUsername}
+              onChange={(e) => setRegisterUsername(e.target.value)}
             />
             <input
               type="email"
               placeholder="Email"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
               required
-            />
-            <input
-              type="email"
-              placeholder="Verify Email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              required
+              value={registerEmail}
+              onChange={(e) => setRegisterEmail(e.target.value)}
             />
             <input
               type="password"
               placeholder="Password"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
               required
-            />
-            <input
-              type="password"
-              placeholder="Verify Password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-              required
+              value={registerPassword}
+              onChange={(e) => setRegisterPassword(e.target.value)}
             />
             <button
               type="submit"
@@ -74,7 +88,7 @@ function Login() {
               }}
             />
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit={handleLogin}>
               <input
                 type="email"
                 placeholder="Email"

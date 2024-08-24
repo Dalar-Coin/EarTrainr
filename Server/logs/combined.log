@@ -1,0 +1,52 @@
+{"level":"info","message":"Login attempt for user: testuser","timestamp":"2024-08-24T05:10:26.647Z"}
+{"level":"debug","message":"Password received: testpass","timestamp":"2024-08-24T05:10:26.650Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$xTPntn.tzvA1YowSq57YhehhZjNsSeQd8gjChvCK6cDKOq1Lo878S","timestamp":"2024-08-24T05:10:26.669Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:10:26.670Z"}
+{"level":"debug","message":"Stored hash: $2b$12$xTPntn.tzvA1YowSq57YhehhZjNsSeQd8gjChvCK6cDKOq1Lo878S","timestamp":"2024-08-24T05:10:26.670Z"}
+{"level":"debug","message":"Candidate password: testpass","timestamp":"2024-08-24T05:10:26.671Z"}
+{"level":"info","message":"Password match: false","timestamp":"2024-08-24T05:10:26.896Z"}
+{"level":"info","message":"Password match result: false","timestamp":"2024-08-24T05:10:26.896Z"}
+{"level":"info","message":"Login attempt for user: testuser2","timestamp":"2024-08-24T05:10:26.908Z"}
+{"level":"debug","message":"Password received: testpass2","timestamp":"2024-08-24T05:10:26.909Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$JMr/nk9vWH5XCdZBbJ9iaeRk14rs6fjnPkE46f4Gmazyzi.VcUgum","timestamp":"2024-08-24T05:10:26.920Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:10:26.920Z"}
+{"level":"debug","message":"Stored hash: $2b$12$JMr/nk9vWH5XCdZBbJ9iaeRk14rs6fjnPkE46f4Gmazyzi.VcUgum","timestamp":"2024-08-24T05:10:26.921Z"}
+{"level":"debug","message":"Candidate password: testpass2","timestamp":"2024-08-24T05:10:26.921Z"}
+{"level":"info","message":"Password match: false","timestamp":"2024-08-24T05:10:27.145Z"}
+{"level":"info","message":"Password match result: false","timestamp":"2024-08-24T05:10:27.146Z"}
+{"level":"info","message":"Login attempt for user: testuser3","timestamp":"2024-08-24T05:10:27.151Z"}
+{"level":"debug","message":"Password received: testpass3","timestamp":"2024-08-24T05:10:27.151Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$x8VJBioAXtr4RXzaBuHlsu4.yCOwY.91zvw/RqjiqOSJ6xLVhKuR.","timestamp":"2024-08-24T05:10:27.163Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:10:27.163Z"}
+{"level":"debug","message":"Stored hash: $2b$12$x8VJBioAXtr4RXzaBuHlsu4.yCOwY.91zvw/RqjiqOSJ6xLVhKuR.","timestamp":"2024-08-24T05:10:27.164Z"}
+{"level":"debug","message":"Candidate password: testpass3","timestamp":"2024-08-24T05:10:27.164Z"}
+{"level":"info","message":"Password match: true","timestamp":"2024-08-24T05:10:27.387Z"}
+{"level":"info","message":"Password match result: true","timestamp":"2024-08-24T05:10:27.387Z"}
+{"level":"info","message":"Attempting to reset password for user: testuser","timestamp":"2024-08-24T05:12:45.934Z"}
+{"level":"info","message":"Password successfully reset for user: testuser","timestamp":"2024-08-24T05:12:46.202Z"}
+{"level":"info","message":"Attempting to reset password for user: testuser2","timestamp":"2024-08-24T05:12:46.207Z"}
+{"level":"info","message":"Password successfully reset for user: testuser2","timestamp":"2024-08-24T05:12:46.457Z"}
+{"level":"info","message":"Login attempt for user: testuser","timestamp":"2024-08-24T05:12:56.086Z"}
+{"level":"debug","message":"Password received: testpass","timestamp":"2024-08-24T05:12:56.087Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$6IQb.tGZs5yc.Cqc0d6EAeLi6NnzXMSr7jtuKhMglFx55ZJwQs2WO","timestamp":"2024-08-24T05:12:56.099Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:12:56.100Z"}
+{"level":"debug","message":"Stored hash: $2b$12$6IQb.tGZs5yc.Cqc0d6EAeLi6NnzXMSr7jtuKhMglFx55ZJwQs2WO","timestamp":"2024-08-24T05:12:56.100Z"}
+{"level":"debug","message":"Candidate password: testpass","timestamp":"2024-08-24T05:12:56.101Z"}
+{"level":"info","message":"Password match: true","timestamp":"2024-08-24T05:12:56.324Z"}
+{"level":"info","message":"Password match result: true","timestamp":"2024-08-24T05:12:56.325Z"}
+{"level":"info","message":"Login attempt for user: testuser2","timestamp":"2024-08-24T05:12:56.329Z"}
+{"level":"debug","message":"Password received: testpass2","timestamp":"2024-08-24T05:12:56.329Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$4O4RsdPgZhJvT9qB2IIiaebf0VWbaQNtAE3kBusCelaE/zX15bnCC","timestamp":"2024-08-24T05:12:56.342Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:12:56.342Z"}
+{"level":"debug","message":"Stored hash: $2b$12$4O4RsdPgZhJvT9qB2IIiaebf0VWbaQNtAE3kBusCelaE/zX15bnCC","timestamp":"2024-08-24T05:12:56.342Z"}
+{"level":"debug","message":"Candidate password: testpass2","timestamp":"2024-08-24T05:12:56.342Z"}
+{"level":"info","message":"Password match: true","timestamp":"2024-08-24T05:12:56.565Z"}
+{"level":"info","message":"Password match result: true","timestamp":"2024-08-24T05:12:56.565Z"}
+{"level":"info","message":"Login attempt for user: testuser3","timestamp":"2024-08-24T05:12:56.568Z"}
+{"level":"debug","message":"Password received: testpass3","timestamp":"2024-08-24T05:12:56.568Z"}
+{"level":"debug","message":"User found. Stored password hash: $2b$12$x8VJBioAXtr4RXzaBuHlsu4.yCOwY.91zvw/RqjiqOSJ6xLVhKuR.","timestamp":"2024-08-24T05:12:56.581Z"}
+{"level":"debug","message":"Comparing passwords:","timestamp":"2024-08-24T05:12:56.581Z"}
+{"level":"debug","message":"Stored hash: $2b$12$x8VJBioAXtr4RXzaBuHlsu4.yCOwY.91zvw/RqjiqOSJ6xLVhKuR.","timestamp":"2024-08-24T05:12:56.582Z"}
+{"level":"debug","message":"Candidate password: testpass3","timestamp":"2024-08-24T05:12:56.582Z"}
+{"level":"info","message":"Password match: true","timestamp":"2024-08-24T05:12:56.805Z"}
+{"level":"info","message":"Password match result: true","timestamp":"2024-08-24T05:12:56.806Z"}
