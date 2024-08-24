@@ -5,8 +5,10 @@ import dubstep from "/songs/Free Time Finally.wav";
 import progHouse from "/songs/Prog House.wav";
 import trapBeat from "/songs/First Trap Beat.wav";
 
-function isWindowWithWebkitAudioContext(window: Window): window is Window & { webkitAudioContext: typeof AudioContext } {
-  return 'webkitAudioContext' in window;
+function isWindowWithWebkitAudioContext(
+  window: Window
+): window is Window & { webkitAudioContext: typeof AudioContext } {
+  return "webkitAudioContext" in window;
 }
 
 function Peaks() {
@@ -31,12 +33,12 @@ function Peaks() {
     } else if (isWindowWithWebkitAudioContext(window)) {
       AudioContextConstructor = window.webkitAudioContext;
     } else {
-      throw new Error('AudioContext not supported in this browser');
+      throw new Error("AudioContext not supported in this browser");
     }
-    
+
     audioContext.current = new AudioContextConstructor();
     peaksEQ.current = new PeaksEQ(audioContext.current);
-    
+
     return () => {
       const closeContext = async () => {
         if (audioContext.current) {
@@ -47,7 +49,7 @@ function Peaks() {
           }
         }
       };
-      
+
       closeContext();
     };
   }, []);
@@ -78,8 +80,9 @@ function Peaks() {
 
       const response = await fetch(randomSong);
       const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer =
-        await audioContext.current.decodeAudioData(arrayBuffer);
+      const audioBuffer = await audioContext.current.decodeAudioData(
+        arrayBuffer
+      );
 
       sourceNode.current = audioContext.current.createBufferSource();
       sourceNode.current.buffer = audioBuffer;
@@ -122,9 +125,9 @@ function Peaks() {
     setRoundEnded(true);
     sourceNode.current?.stop();
 
-    setTotalGuesses(prev => prev + 1);
+    setTotalGuesses((prev) => prev + 1);
     if (guess === boostedBand) {
-      setCorrectGuesses(prev => prev + 1);
+      setCorrectGuesses((prev) => prev + 1);
     }
   };
 
@@ -159,7 +162,9 @@ function Peaks() {
           <button
             onClick={() => setIsEQEnabled(!isEQEnabled)}
             className={`px-4 py-2 ${
-              isEQEnabled ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"
+              isEQEnabled
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"
             } text-white rounded mb-4`}
           >
             {isEQEnabled ? "Disable EQ" : "Enable EQ"}
